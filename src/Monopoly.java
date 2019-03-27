@@ -1,40 +1,32 @@
 import java.util.Scanner;
 
 public class Monopoly {
-	Die die = new Die();
-	Board board;
-	
-	public Monopoly(int totalPlayer) {
-		board = new Board(totalPlayer);
-	}
-	
-	public static void main(String[] args) {
-		System.out.println("\tMonopoly\n");
-		Scanner scanner = new Scanner(System.in);
-		int totalPlayer = 0;
-		while (totalPlayer < 2 || totalPlayer > 8) {
-			try {
-				System.out.println("How many people are playing?");
-				System.out.print("Players (2 - 8): ");
-				totalPlayer = scanner.nextInt();
-			}
-			catch(Exception e) {
-				System.err.println("Error: Number too large.");
-				continue;
-			}
-			if(totalPlayer > 8) {
-				System.err.println("Error: Invalid player count.");
-			}
-		}
-		scanner.close();
-		Monopoly game = new Monopoly(totalPlayer);
-		game.startGame();
-	}
-	
-	public void startGame() {
-		System.out.println("Game start!");
-		System.out.println("========");
-		while (!isGameEnd() && !board.hasWinner()){
+    public static final int END_GAME_CHOICE = 3;
+    Board board;
+    Scanner scanner = MonopolyScanner.getScanner();
+
+    public Monopoly(int totalPlayers) {
+        board = new Board(totalPlayers);
+    }
+
+    public static void main(String[] args) {
+        System.out.println("\tMonopoly\n");
+        int totalPlayers = getNumberOfPlayers();
+        Monopoly game = new Monopoly(totalPlayers);
+        game.startGame();
+    }
+
+    public void startGame() {
+        int choice = 100;
+        while (choice != END_GAME_CHOICE) {
+            MonopolyPrinter.choosePlayerMenu(board);
+            processTurn(scanner.nextInt());
+        }
+
+
+
+		/*
+        while (!isGameEnd() && !board.hasWinner()){
 			if(!board.getCurrentPlayer().isBrokeOut()){
 				int face = board.getCurrentPlayer().tossDie(die);
 				board.movePlayer(board.getCurrentPlayer(), face);
@@ -55,5 +47,77 @@ public class Monopoly {
 			if(player.getTotalWalk() < 20){ return false; }
 		}
 		return true;
-	}
+		*/
+    }
+
+
+    private static int getNumberOfPlayers() {
+        int totalPlayers = 0;
+        while (totalPlayers < 1 || totalPlayers > 2) {
+            try {
+                System.out.println("\t How many people are playing?");
+                System.out.print("\t Players (1 - 2): ");
+                totalPlayers = MonopolyScanner.getScanner().nextInt();
+            } catch (Exception e) {
+                System.err.println("Error: Number too large.");
+                continue;
+            }
+            if (totalPlayers > 2) {
+                System.err.println("Maximum number of players is 2");
+            }
+            if (totalPlayers < 1) {
+                System.err.println("Minimum number of players is 1");
+            }
+        }
+        return totalPlayers;
+    }
+
+    private void processTurn(int choice) {
+        Player player;
+        if (board.currentTurn == 0) {
+            switch (choice) {
+                case 1:
+                    choosePlayer().play(board);
+                    board.nextTurn();
+                    break;
+                case 2:
+                    MonopolyPrinter.printBoard();
+                    break;
+
+                case 3:
+                    board.endGame();
+            }
+        } else {
+            switch (choice) {
+                case 1:
+                    board.getCurrentPlayer().play(board);
+                    board.nextTurn();
+                    break;
+                case 2:
+                    player = board.getSecondPlayer();
+                    System.out.println(player.toString());
+                    player.play(board);
+                    board.nextTurn();
+                    break;
+                case 3:
+                    MonopolyPrinter.printBoard();
+                    break;
+
+                case 4:
+                    board.endGame();
+                    break;
+            }
+        }
+    }
+
+
+    private Player choosePlayer() {
+        String players = "";
+        MonopolyPrinter.printPlayersChoices(board);
+        board.currentPlayer =  scanner.nextInt();
+        Player selectedPlayer = board.getCurrentPlayer();
+        System.out.println(selectedPlayer.toString());
+        return selectedPlayer;
+    }
+
 }
