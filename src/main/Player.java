@@ -1,46 +1,27 @@
-import java.util.Scanner;
+package main;
+
+import main.utils.MonopolyPrinter;
+import main.utils.SquareFactory;
 
 public class Player {
-    int id;
-    String name;
-    int totalWalk = 0;
-    int position = 0;
-    boolean brokeout = false;
-    Money money = new Money(1500);
 
-    Die die = new Die();
-    Scanner scanner = new Scanner(System.in);
+    private int id;
+    private String name;
+    private int totalWalk = 0;
+    private int position = 0;
+    private int rounds=0;
+    private boolean brokeout = false;
+    private Money money = new Money(1500);
 
     public Player(int id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    public void play(Board board){
-        MonopolyPrinter.printActionMenu();
-        switch ( scanner.nextInt()) {
-            case 1:
-                int face = this.tossDie(die);
-                board.movePlayer(this, face);
-                System.out.println(this.toString());
-                break;
-            case 2:
-                MonopolyPrinter.printBoard();
-                break;
-            case 3:
-                board.endGame();
-        }
-    }
-
     public int getTotalWalk() {
         return totalWalk;
     }
 
-    public int tossDie(Die die) {
-        int face = die.getFace();
-        System.out.println(getName() + " toss a die... Face is " + face);
-        return face;
-    }
 
     public int getCurrentPosition() {
         return position;
@@ -56,7 +37,14 @@ public class Player {
     }
 
     public void setPosition(int position) {
-        this.position = position;
+        this.position  = this.position+position;
+        if(this.position > SquareFactory.names.length ){
+            System.out.println(getName()+" passes through the GO cell and earned 200$\nCurrent Credit : "+this.getMoney().money);
+            getMoney().addMoney(200);
+            this.position=Math.abs(position - SquareFactory.names.length);
+            ++rounds;
+        }
+        MonopolyPrinter.printPlayerCurrentPosition(this,SquareFactory.getSquare(position));
     }
 
     public void nextTurn() {
@@ -81,5 +69,13 @@ public class Player {
 
     public void setBrokeOut(boolean brokeout) {
         this.brokeout = brokeout;
+    }
+
+    public int getRounds() {
+        return rounds;
+    }
+
+    public void setRounds(int rounds) {
+        this.rounds = rounds;
     }
 }

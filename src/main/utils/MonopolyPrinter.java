@@ -1,4 +1,8 @@
-import java.util.Arrays;
+package main.utils;
+
+import main.Board;
+import main.Player;
+import main.models.squares.Square;
 
 public class MonopolyPrinter {
 
@@ -15,7 +19,7 @@ public class MonopolyPrinter {
 
     public static void choosePlayerMenu(Board board) {
         String menu;
-        if (board.currentTurn == 0) {
+        if (board.isFirstTurn()) {
             menu = String.format("***********************\n" +
                     "1)Select a player to play\n" +
                     "2)Show the board\n" +
@@ -23,7 +27,7 @@ public class MonopolyPrinter {
         } else {
             menu = String.format("***********************\n" +
                     "1) Play again\n");
-            if(board.totalPlayers>1){
+            if(board.getTotalPlayers()>1){
                 menu = menu.concat("2) Second Player\n");
             }
              menu = menu.concat(
@@ -35,8 +39,8 @@ public class MonopolyPrinter {
 
     public static void printPlayersChoices(Board board){
         String result="";
-        for (int i = 0; i < board.players.length; i++) {
-            result = result.concat(i + 1 + ": " + board.players[i].name + "\n");
+        for (int i = 0; i < board.getPlayers().length; i++) {
+            result = result.concat(i + 1 + ": " + board.getPlayers()[i].getName() + "\n");
         }
          if(!result.isEmpty()) System.out.println("Please select a player : \n" + result);
     }

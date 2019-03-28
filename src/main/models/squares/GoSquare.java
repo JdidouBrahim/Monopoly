@@ -1,3 +1,10 @@
+package main.models.squares;
+
+
+import main.Board;
+import main.utils.MonopolyPrinter;
+import main.Player;
+
 public class GoSquare extends Square {
     public GoSquare(String name) {
         super(name);

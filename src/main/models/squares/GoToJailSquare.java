@@ -1,3 +1,9 @@
+package main.models.squares;
+
+import main.Board;
+import main.utils.MonopolyPrinter;
+import main.Player;
+
 public class GoToJailSquare extends Square {
     public GoToJailSquare(String name) {
         super(name);
@@ -6,6 +12,6 @@ public class GoToJailSquare extends Square {
     @Override
     public void doAction(Player player, Board board) {
         MonopolyPrinter.print(player, player.getName() + " has go to Jail");
-        board.movePlayer(player, -player.getCurrentPosition(), false);
+        playerService.movePlayer(player,board, -player.getCurrentPosition(), false);
     }
 }

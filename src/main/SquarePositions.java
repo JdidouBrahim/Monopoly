@@ -1,3 +1,5 @@
+package main;
+
 public enum SquarePositions {
     GO(0);
 

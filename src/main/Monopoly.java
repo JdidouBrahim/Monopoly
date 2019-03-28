@@ -1,8 +1,20 @@
+package main;
+
+import main.services.BoardService;
+import main.services.impl.DefaultBoardService;
+import main.services.impl.DefaultPlayerService;
+import main.services.PlayerService;
+import main.utils.MonopolyPrinter;
+import main.utils.MonopolyScanner;
+
 import java.util.Scanner;
 
 public class Monopoly {
+
     public static final int END_GAME_CHOICE = 3;
     Board board;
+    private PlayerService playerService = new DefaultPlayerService();
+    private BoardService boardService=new DefaultBoardService();
     Scanner scanner = MonopolyScanner.getScanner();
 
     public Monopoly(int totalPlayers) {
@@ -10,7 +22,7 @@ public class Monopoly {
     }
 
     public static void main(String[] args) {
-        System.out.println("\tMonopoly\n");
+        System.out.println("\t************ Monopoly ************\n");
         int totalPlayers = getNumberOfPlayers();
         Monopoly game = new Monopoly(totalPlayers);
         game.startGame();
@@ -18,37 +30,22 @@ public class Monopoly {
 
     public void startGame() {
         int choice = 100;
-        while (choice != END_GAME_CHOICE) {
+        while (choice != END_GAME_CHOICE && (!isGameEnd() || boardService.hasWinner(board))) {
             MonopolyPrinter.choosePlayerMenu(board);
             processTurn(scanner.nextInt());
         }
-
-
-
-		/*
-        while (!isGameEnd() && !board.hasWinner()){
-			if(!board.getCurrentPlayer().isBrokeOut()){
-				int face = board.getCurrentPlayer().tossDie(die);
-				board.movePlayer(board.getCurrentPlayer(), face);
-			}
-			board.nextTurn();
-		}
-		System.out.println("========");
-		if(board.hasWinner()){
-			System.out.println(board.getWinner().getName() + " is won by don't brokeout!");
-		}else{
-			System.out.println(board.getMaxMoneyPlayer().getName() + " is won by have most money!");
-		}
-		System.out.println("Game over!");
-	}
-	
-	public boolean isGameEnd() {
-		for(Player player:board.getPlayers()){
-			if(player.getTotalWalk() < 20){ return false; }
-		}
-		return true;
-		*/
+        System.out.println("Game Over ... Winner is "+boardService.getWinner(board).getName());
     }
+
+    public boolean isGameEnd() {
+        for (main.Player player : board.getPlayers()) {
+            if (player.getRounds()>= 2 ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
 
     private static int getNumberOfPlayers() {
@@ -74,11 +71,11 @@ public class Monopoly {
 
     private void processTurn(int choice) {
         Player player;
-        if (board.currentTurn == 0) {
+        if (board.isFirstTurn()) {
             switch (choice) {
                 case 1:
-                    choosePlayer().play(board);
-                    board.nextTurn();
+                    choosePlayer();
+                    playerService.play(board);
                     break;
                 case 2:
                     MonopolyPrinter.printBoard();
@@ -87,17 +84,17 @@ public class Monopoly {
                 case 3:
                     board.endGame();
             }
+            board.setFirstTurn(Boolean.FALSE);
         } else {
             switch (choice) {
                 case 1:
-                    board.getCurrentPlayer().play(board);
-                    board.nextTurn();
+                    playerService.play(board);
                     break;
                 case 2:
                     player = board.getSecondPlayer();
                     System.out.println(player.toString());
-                    player.play(board);
-                    board.nextTurn();
+                    playerService.play(board);
+
                     break;
                 case 3:
                     MonopolyPrinter.printBoard();
@@ -112,9 +109,8 @@ public class Monopoly {
 
 
     private Player choosePlayer() {
-        String players = "";
         MonopolyPrinter.printPlayersChoices(board);
-        board.currentPlayer =  scanner.nextInt();
+        board.setCurrentPlayer(scanner.nextInt());
         Player selectedPlayer = board.getCurrentPlayer();
         System.out.println(selectedPlayer.toString());
         return selectedPlayer;
